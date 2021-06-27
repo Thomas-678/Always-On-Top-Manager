@@ -4,6 +4,7 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #singleInstance
 #persistent
+Menu, Tray, Icon, %A_WinDir%\System32\imageres.dll, 234
 ; get always on top state
 AOT(_id)
 {
@@ -26,7 +27,9 @@ Gui, 2:Color, FF0000
 Gui, 2:-Caption
 
 Menu, Tray, Click, 1
+Menu, Tray, NoStandard
 Menu, Tray, Add, Show GUI, RefreshListView
+Menu, Tray, Standard
 Menu, Tray, Default, Show GUI
 
 Gosub UpdateExplorerPID ; explorer.exe has several useless hidden windows, need to ignore them in GUI
