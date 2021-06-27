@@ -16,9 +16,14 @@ AOT(_id)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Create the ListView
 ; 1st column contains empty data
-Gui, Add, ListView, r15 w600 gMyListView, null|Top?|Title|pid|id
-Gui, +AlwaysOnTop -SysMenu +LastFound
+Gui, 1:Add, ListView, r15 w600 AltSubmit gMyListView, null|Top?|Title|pid|id
+Gui, 1:+AlwaysOnTop -SysMenu +LastFound
 hGui := WinExist()
+
+; Create 2nd GUI that create highlight border around a window
+Gui, 2:+Toolwindow
+Gui, 2:Color, FF0000
+Gui, 2:-Caption
 
 Menu, Tray, Click, 1
 Menu, Tray, Add, Show GUI, RefreshListView
@@ -34,22 +39,28 @@ MouseGetPos,,, hWinUM
 if (hWinUM != hGui)
 {
 	GuiClose:
-	Gui, Hide
+	GuiEscape:
+	Gui, 1:Hide
 	LV_Delete()
 }
 return
 
 MyListView:
-if (A_GuiEvent = "DoubleClick")
+if (A_GuiEvent = "DoubleClick" or A_GuiEvent = "RightClick")
 {
     LV_GetText(progName, A_EventInfo, 3)  
     LV_GetText(onTopID, A_EventInfo, 5) 
     ;WinSet, ExStyle, +0x8, ahk_id %onTopID% ;Non-working command
-    WinSet, AlwaysOnTop,, ahk_id %onTopID%
-    Gui, +AlwaysOnTop
+    WinSet, AlwaysOnTop,, ahk_id %onTopID% ; toggle topmost state
+    Gui, 1:+AlwaysOnTop
     ;msgbox, You selected program: %progName%
     ;RefreshListView()
     LV_Modify(A_EventInfo, "Col2", AOT(onTopID))
+}
+else if (A_GuiEvent = "Normal") ; single left click
+{
+	LV_GetText(highlightID, A_EventInfo, 5)
+	DrawRect(highlightID)
 }
 return
 
@@ -73,6 +84,24 @@ LV_ModifyCol(2, "AutoHdr right")
 LV_ModifyCol(3, "Auto Sort")
 LV_ModifyCol(4, "AutoHdr")
 LV_ModifyCol(5, "0") ; Hide column (id) by resizing width to 0
-Gui, Show, x0 yCenter autosize
-Gui, +AlwaysOnTop
+Gui, 1:Show, x0 yCenter autosize
+Gui, 1:+AlwaysOnTop
+return
+
+DrawRect(_id)
+{
+	b = 6 ;border thickness
+	WinGetPos, x, y, w, h, ahk_id %_id%
+	;bring the window on top first
+	WinSet, AlwaysOnTop, On, ahk_id %_id%
+	WinSet, AlwaysOnTop, Off, ahk_id %_id%
+	Gui, 2:+AlwaysOnTop +Lastfound
+	q:=w-b, z:=h-b 
+	WinSet, Region, 0-0 %w%-0 %w%-%h% 0-%h% 0-0  %b%-%b% %q%-%b% %q%-%z% %b%-%z% %b%-%b%
+	Gui, 2:Show, w%w% h%h% x%x% y%y% NoActivate
+	;Gui, 2:Show, w%w% h%h% x%x% y%y% NoActivate
+	SetTimer, StopWindowHighlight, -1000
+}
+StopWindowHighlight:
+Gui, 2:hide
 return
