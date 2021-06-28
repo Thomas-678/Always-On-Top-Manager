@@ -45,11 +45,12 @@ if (hWinUM != hGui)
 	GuiEscape:
 	Gui, 1:Hide
 	LV_Delete()
-}
+} else
+	Gui, 1:+AlwaysOnTop
 return
 
 MyListView:
-if (A_GuiEvent = "DoubleClick" or A_GuiEvent = "RightClick")
+if (A_GuiEvent = "A" or A_GuiEvent = "RightClick") ; double click or right click
 {
     LV_GetText(progName, A_EventInfo, 3)  
     LV_GetText(onTopID, A_EventInfo, 5) 
@@ -63,7 +64,7 @@ if (A_GuiEvent = "DoubleClick" or A_GuiEvent = "RightClick")
 else if (A_GuiEvent = "Normal") ; single left click
 {
 	LV_GetText(highlightID, A_EventInfo, 5)
-	DrawRect(highlightID)
+	try DrawRect(highlightID)
 }
 return
 
@@ -95,15 +96,22 @@ DrawRect(_id)
 {
 	b = 6 ;border thickness
 	WinGetPos, x, y, w, h, ahk_id %_id%
-	;bring the window on top first
-	WinSet, AlwaysOnTop, On, ahk_id %_id%
-	WinSet, AlwaysOnTop, Off, ahk_id %_id%
-	Gui, 2:+AlwaysOnTop +Lastfound
 	q:=w-b, z:=h-b 
+	;bring selected window on top without activating it
+	if (AOT(_id) = 0)
+	{
+		WinSet, AlwaysOnTop, On, ahk_id %_id%
+		WinSet, AlwaysOnTop, Off, ahk_id %_id%
+	} else
+	{
+		WinSet, Top,, ahk_id %_id%
+	}
+	Gui, 2:+AlwaysOnTop +Lastfound
 	WinSet, Region, 0-0 %w%-0 %w%-%h% 0-%h% 0-0  %b%-%b% %q%-%b% %q%-%z% %b%-%z% %b%-%b%
 	Gui, 2:Show, w%w% h%h% x%x% y%y% NoActivate
-	;Gui, 2:Show, w%w% h%h% x%x% y%y% NoActivate
 	SetTimer, StopWindowHighlight, -1000
+	;prevent selected window from covering this GUI
+	Gui, 1:+AlwaysOnTop
 }
 StopWindowHighlight:
 Gui, 2:hide
