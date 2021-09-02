@@ -1,7 +1,7 @@
+ListLines Off ; minor optimization. Disable logging of recently executed lines
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-ListLines Off ; minor optimization. Disable logging of recently executed lines
 #singleInstance
 #persistent
 Menu, Tray, Icon, %A_WinDir%\System32\imageres.dll, 234
@@ -25,6 +25,9 @@ Menu, Tray, NoStandard
 Menu, Tray, Add, Show GUI, RefreshListView
 Menu, Tray, Standard
 Menu, Tray, Default, Show GUI
+
+CoordMode, Mouse, Screen
+SysGet, MWA_, MonitorWorkArea
 
 return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -52,17 +55,14 @@ if (A_GuiEvent = "A" or A_GuiEvent = "RightClick") ; double click or right click
 {
     LV_GetText(onTopID, A_EventInfo, 5) 
     ;WinSet, ExStyle, +0x8, ahk_id %onTopID% ;Non-working command
-    
-    ; sometimes when the window is minimized, AOT state cannot be toggle
-    ; create workaround
-    WinGet, minState, MinMax, ahk_id %onTopID%
-    if (AOT(onTopID) = 0 and minState = -1) ; not on top and minimized
-	{
+
+    if (AOT(onTopID) = 0) ; not on top
+	{	
 		WinActivate, ahk_id %onTopID%
 		WinSet, AlwaysOnTop, On, ahk_id %onTopID%
 	} else
 	{
-		WinSet, AlwaysOnTop, toggle, ahk_id %onTopID% ; toggle topmost state
+		WinSet, AlwaysOnTop, , ahk_id %onTopID% ; toggle topmost state
 	}
     
     Gui, 1:+AlwaysOnTop
@@ -94,8 +94,15 @@ LV_ModifyCol(2, "AutoHdr right")
 LV_ModifyCol(3, "Auto Sort")
 LV_ModifyCol(4, "AutoHdr")
 LV_ModifyCol(5, "0") ; Hide column (id) by resizing width to 0
-Gui, 1:Show, x0 yCenter autosize
-Gui, 1:+AlwaysOnTop
+
+Gui, 1:Show, Hide
+Gui, 1:+lastfound
+WinGetPos,,, W, H
+MouseGetPos, Mx, My
+Final_x := max(MWA_Left, min(Mx, MWA_Right - W))
+Final_y := max(MWA_Top, min(My, MWA_Bottom - H))
+Gui, 1:Show, x%Final_x% y%Final_y%
+Gui, 1:+alwaysontop
 return
 
 StopWindowHighlight:
@@ -152,4 +159,12 @@ HasVal(haystack, needle) {
 	if !IsObject(haystack)
 		throw Exception("Bad haystack!", -1, haystack)
 	return 0 ; not found
+}
+
+min(a, b) {
+    Return, a < b ? a : b
+}
+
+max(a, b) {
+    Return, a > b ? a : b
 }
