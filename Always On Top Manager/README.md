@@ -5,7 +5,7 @@ A small GUI that lets you control which should be set to Always On Top.
 
 # How to use
 
-Download and launch the ahk file if you have AHK installed or the [exe file](https://github.com/Thomas-678/Always-On-Top-Manager/releases/latest/download/AlwaysOnTopManager.zip).<br>
+Download and launch the ahk file if you have AHK installed or the [exe file](https://github.com/Thomas-678/Always-On-Top-Manager/releases/latest/download/Always-On-Top-Manager.7z).<br>
 Click on the tray icon <img src="https://user-images.githubusercontent.com/51830149/123543402-ca9cee00-d780-11eb-9143-c8c334183a82.png">
  to spawn the GUI near the cursor.<br>
 <b>Left click</b> on an entry to highlight the window (draw a red border around it).<br>
