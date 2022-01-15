@@ -6,7 +6,7 @@ CoordMode, Mouse, Screen
 Gui, Add, Button, x2 y-1 w60 h40 gLeft, Left
 Gui, Add, Button, x62 y-1 w60 h40 gRight, Right
 Gui, +AlwaysOnTop ToolWindow +hwndGuiHwnd
-Gui, show, xCenter yCenter h40 w127
+Gui, show, xCenter yCenter h40 w124
 
 Menu, Tray, Click, 1
 Menu, Tray, NoStandard
