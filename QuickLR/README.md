@@ -8,5 +8,6 @@ This script lets you simualte Left/Right arrow key on the window located underne
 
 -  Move the spawned window so that its top left corner is located above the target window.
 -  Click the left or right button to send Left/Right arrow key to the window underneath.
+-  Use Mouse Wheel Up/Down anywhere within the window to send Left/Right arrow key.
 -  Click the close button to hide the window.
 -  Click on the tray icon the bring up the window.

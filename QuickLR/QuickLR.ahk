@@ -1,6 +1,7 @@
 ﻿#NoEnv
 ListLines Off
 #MaxHotkeysPerInterval 1000
+CoordMode, Mouse, Screen
 ; #Warn
 Gui, Add, Button, x2 y-1 w60 h40 gLeft, Left
 Gui, Add, Button, x62 y-1 w60 h40 gRight, Right
@@ -15,22 +16,35 @@ Menu, Tray, Default, Show GUI
 
 return
 
-Send_bg:
-Gosub GetTargetWin
+Send_bg(key)
+{
+targetWin:= GetTargetWin()
 ControlFocus,, ahk_id %targetWin% 
 ControlSend,,%key%, ahk_id %targetWin% 
 Gui, +AlwaysOnTop
 return
-
+}
 Left:
-key:="{left}"
-Gosub Send_bg
+Send_bg("{left}")
 return
 
 Right:
-key:="{Right}"
-Gosub Send_bg
+Send_bg("{Right}")
 return
+
+#if BoundCheck()
+~WheelUp::Send_bg("{Left}")
+~WheelDown::Send_bg("{Right}")
+#if
+BoundCheck()
+{
+global GuiHwnd
+MouseGetPos,,,id
+if (id= GuiHWnd)
+	return True
+Else
+	return False
+}
 
 GuiClose:
 Gui, Hide
@@ -48,12 +62,14 @@ WindowFromPos(X, Y, DetectHidden := False) {
                                           , "UPtr")
 }
 
-GetTargetWin:
+GetTargetWin()
+{
+global GuiHwnd
 WinGetPos, x, y,,,ahk_id %GuiHwnd%
 x-=1, y-=1
 if x<0 
 	x:=0
 if y<0 
 	y:=0
-targetWin:= WindowFromPos(x,y)
-return
+return targetWin:= WindowFromPos(x,y)
+}
